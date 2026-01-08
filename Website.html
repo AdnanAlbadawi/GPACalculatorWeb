@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator</title>
+    <style>
+        /* CSS - The Design */
+        body {
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 6px 32px rgba(80, 120, 180, 0.11);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 480px;
+            animation: cardEnter 0.7s cubic-bezier(.93,.26,.53,1.14);
+            text-align: center; /* Centers content including logo */
+        }
+
+        @keyframes cardEnter {
+            from { transform: translateY(48px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* NEW: Logo Style */
+        .logo {
+            width: 80px;  /* Adjust this size as needed */
+            height: auto;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        h2 {
+            color: #30415d;
+            margin: 0 0 25px 0;
+            font-weight: 600;
+        }
+
+        .grid-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr; /* Course - Grade - Credits */
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #30415d;
+            font-size: 0.9rem;
+            text-align: left; /* Keep table headers left-aligned */
+        }
+
+        .course-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #bed2f7;
+            border-radius: 7px;
+            background: #f7faff;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #005ecb;
+            box-shadow: 0 0 0 3px rgba(0, 94, 203, 0.1);
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(90deg, #569af6 0%, #47e4d7 100%);
+            color: white;
+            font-size: 1.1rem;
+            padding: 12px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #205077;
+            min-height: 30px;
+        }
+
+        .error { color: #d9534f !important; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img src="icon.png" alt="University Logo" class="logo">
+    
+    <h2>GPA Calculator</h2>
+    
+    <div class="grid-header">
+        <span>Course</span>
+        <span>Grade</span>
+        <span>Credits</span>
+    </div>
+
+    <div id="course-container">
+        </div>
+
+    <button onclick="calculateGPA()">Calculate GPA</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    // JS - The Logic
+
+    const container = document.getElementById('course-container');
+    
+    // Note: I added Ajman University specific grading here just in case
+    const gradeOptions = `
+        <option value="">-</option>
+        <option value="4.0">A</option>
+        <option value="3.5">B+</option>
+        <option value="3.0">B</option>
+        <option value="2.5">C+</option>
+        <option value="2.0">C</option>
+        <option value="1.5">D+</option>
+        <option value="1.0">D</option>
+        <option value="0.0">F</option>
+    `;
+
+    for (let i = 1; i <= 6; i++) {
+        const row = document.createElement('div');
+        row.className = 'course-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Course ${i}">
+            <select class="grade-select">${gradeOptions}</select>
+            <input type="number" class="credit-input" placeholder="3">
+        `;
+        container.appendChild(row);
+    }
+
+    function calculateGPA() {
+        let totalPoints = 0;
+        let totalCredits = 0;
+        let hasData = false;
+        
+        const grades = document.querySelectorAll('.grade-select');
+        const credits = document.querySelectorAll('.credit-input');
+        const resultDiv = document.getElementById('result');
+
+        resultDiv.className = ""; 
+
+        for (let i = 0; i < 6; i++) {
+            const gradeVal = parseFloat(grades[i].value);
+            const creditVal = parseFloat(credits[i].value);
+
+            if (!isNaN(gradeVal) && !isNaN(creditVal)) {
+                totalPoints += (gradeVal * creditVal);
+                totalCredits += creditVal;
+                hasData = true;
+            }
+        }
+
+        if (!hasData) {
+            resultDiv.innerText = "Please fill at least one course.";
+            resultDiv.className = "error";
+            return;
+        }
+
+        const gpa = totalPoints / totalCredits;
+        resultDiv.innerText = "Your GPA is: " + gpa.toFixed(2);
+    }
+</script>
+
+</body>
+</html>
