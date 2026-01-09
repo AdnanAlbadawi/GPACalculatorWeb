@@ -2,7 +2,7 @@
 
 A responsive, web-based GPA calculator designed for Ajman University students. This tool allows students to calculate their semester GPA quickly and accurately directly from their browser, with no installation required.
 
-**[View Live Demo](#)** *( https://adnanalbadawi.github.io/GPACalculatorWeb/ )*
+**View Live Demo** *( https://adnanalbadawi.github.io/GPACalculatorWeb/ )*
 
 ## 🚀 Features
 * **No Installation Needed:** Works instantly in any web browser (Chrome, Safari, Edge).
