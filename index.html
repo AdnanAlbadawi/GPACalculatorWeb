@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPA Calculator - Ajman University</title>
+    
+    <link rel="icon" type="image/png" href="icon.png">
+
     <style>
         /* CSS - The Design */
         body {
@@ -14,6 +17,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* Prevents scrollbars during animations */
         }
 
         .card {
@@ -24,7 +28,7 @@
             width: 90%;
             max-width: 480px;
             animation: cardEnter 0.7s cubic-bezier(.93,.26,.53,1.14);
-            text-align: center; /* Centers content including logo */
+            text-align: center;
         }
 
         @keyframes cardEnter {
@@ -32,12 +36,13 @@
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        /* NEW: Logo Style */
         .logo {
-            width: 80px;  /* Adjust this size as needed */
+            width: 80px;
             height: auto;
             margin-bottom: 10px;
             display: inline-block;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         h2 {
@@ -54,7 +59,7 @@
             font-weight: 600;
             color: #30415d;
             font-size: 0.9rem;
-            text-align: left; /* Keep table headers left-aligned */
+            text-align: left;
         }
 
         .course-row {
@@ -72,12 +77,14 @@
             background: #f7faff;
             box-sizing: border-box;
             font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: #005ecb;
             box-shadow: 0 0 0 3px rgba(0, 94, 203, 0.1);
+            transform: scale(1.02);
         }
 
         button {
@@ -91,7 +98,13 @@
             cursor: pointer;
             font-weight: bold;
             margin-top: 20px;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(70,154,246,0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(70,154,246,0.4);
         }
 
         button:active {
@@ -104,9 +117,51 @@
             font-weight: bold;
             color: #205077;
             min-height: 30px;
+            opacity: 0; /* Hidden initially for animation */
+            transition: opacity 0.3s;
         }
 
-        .error { color: #d9534f !important; }
+        /* NEW: Footer and Note Styles */
+        .note-label {
+            font-size: 12px;
+            color: #7a8b9e;
+            margin-top: 8px;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .footer-label {
+            font-size: 12px;
+            color: #94aabf;
+            margin-top: 25px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Animations */
+        .error-shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff4d4d !important;
+            background-color: #fff0f0 !important;
+        }
+
+        .pop-anim {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn { 
+            0% { opacity: 0; transform: scale(0.5); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
+
+        @keyframes shake { 
+            0%, 100% { transform: translateX(0); } 
+            20% { transform: translateX(-10px); } 
+            40% { transform: translateX(10px); } 
+            60% { transform: translateX(-5px); } 
+            80% { transform: translateX(5px); } 
+        }
     </style>
 </head>
 <body>
@@ -126,15 +181,17 @@
         </div>
 
     <button onclick="calculateGPA()">Calculate GPA</button>
+    
     <div id="result"></div>
+    <div id="note" class="note-label"></div>
+    
+    <div class="footer-label">made with 💖 by adnan</div>
 </div>
 
 <script>
-    // JS - The Logic
-
     const container = document.getElementById('course-container');
     
-    // Note: I added Ajman University specific grading here just in case
+    // Ajman University Grading Scale
     const gradeOptions = `
         <option value="">-</option>
         <option value="4.0">A</option>
@@ -147,6 +204,7 @@
         <option value="0.0">F</option>
     `;
 
+    // Create 6 rows
     for (let i = 1; i <= 6; i++) {
         const row = document.createElement('div');
         row.className = 'course-row';
@@ -166,14 +224,35 @@
         const grades = document.querySelectorAll('.grade-select');
         const credits = document.querySelectorAll('.credit-input');
         const resultDiv = document.getElementById('result');
+        const noteDiv = document.getElementById('note');
 
-        resultDiv.className = ""; 
+        // Reset Styles & Animations
+        resultDiv.classList.remove('pop-anim');
+        resultDiv.style.color = '#205077';
+        resultDiv.style.opacity = '0';
+        noteDiv.style.opacity = '0';
+
+        // Remove error shakes from previous run
+        grades.forEach(g => g.classList.remove('error-shake'));
+        credits.forEach(c => c.classList.remove('error-shake'));
 
         for (let i = 0; i < 6; i++) {
             const gradeVal = parseFloat(grades[i].value);
             const creditVal = parseFloat(credits[i].value);
 
-            if (!isNaN(gradeVal) && !isNaN(creditVal)) {
+            // Check if user filled one but not the other (Partial Data Error)
+            const gradeFilled = !isNaN(gradeVal);
+            const creditFilled = !isNaN(creditVal);
+
+            if (gradeFilled && !creditFilled) {
+                credits[i].classList.add('error-shake'); // Shake the missing credit
+            }
+            if (!gradeFilled && creditFilled) {
+                grades[i].classList.add('error-shake'); // Shake the missing grade
+            }
+
+            // Standard Calculation if both exist
+            if (gradeFilled && creditFilled) {
                 totalPoints += (gradeVal * creditVal);
                 totalCredits += creditVal;
                 hasData = true;
@@ -181,17 +260,29 @@
         }
 
         if (!hasData) {
-            resultDiv.innerText = "Please fill at least one course.";
-            resultDiv.className = "error";
+            resultDiv.innerText = "Please fill at least one course & credit.";
+            resultDiv.style.color = "#ff4d4d";
+            resultDiv.style.opacity = "1";
+            
+            // Shake the button to indicate error
+            const btn = document.querySelector('button');
+            btn.classList.add('error-shake');
+            setTimeout(() => btn.classList.remove('error-shake'), 400);
             return;
         }
 
+        // Final Calculation
         const gpa = totalPoints / totalCredits;
+        
         resultDiv.innerText = "Your GPA is: " + gpa.toFixed(2);
+        
+        // Trigger Pop Animation
+        void resultDiv.offsetWidth; // Force reflow
+        resultDiv.classList.add('pop-anim');
+        
+       
     }
 </script>
 
 </body>
 </html>
-
-
