@@ -24,8 +24,8 @@ The calculator uses the official 4.0 scale:
 | **F** | 0.0 |
 
 ## 🛠️ Built With
-* **HTML5** - Structure
-* **CSS3** - Styling and Layout
+* **HTML** - Structure
+* **CSS** - Styling and Layout
 * **JavaScript** - Logic and Calculation
 
 
