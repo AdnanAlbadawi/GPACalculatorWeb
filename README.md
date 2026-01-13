@@ -11,7 +11,7 @@ A responsive, web-based GPA calculator designed for Ajman University students. T
 * **Input Validation:** Automatically handles incorrect inputs to ensure calculation accuracy.
 
 ## 📊 Grading Scale
-The calculator uses the official 4.0 scale:
+The calculator uses the official 4.0 scale for Ajman University:
 
 | Grade | Points |
 | :---: | :---: |
