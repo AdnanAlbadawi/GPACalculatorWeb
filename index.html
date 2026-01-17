@@ -77,6 +77,7 @@
         .course-row:nth-child(4) { animation-delay: 0.25s; }
         .course-row:nth-child(5) { animation-delay: 0.3s; }
         .course-row:nth-child(6) { animation-delay: 0.35s; }
+        .course-row:nth-child(7) { animation-delay: 0.4s; } /* Added for Course 7 */
 
         input, select {
             width: 100%;
@@ -203,8 +204,8 @@
         <option value="0.0">F</option>
     `;
 
-    // Create 6 rows
-    for (let i = 1; i <= 6; i++) {
+    // UPDATED: Loop runs 7 times now
+    for (let i = 1; i <= 7; i++) {
         const row = document.createElement('div');
         row.className = 'course-row';
         row.innerHTML = `
@@ -241,7 +242,8 @@
         const btn = document.querySelector('button');
         btn.classList.remove('error-shake');
 
-        for (let i = 0; i < 6; i++) {
+        // UPDATED: Loop runs 7 times to check all inputs
+        for (let i = 0; i < 7; i++) {
             const gradeVal = parseFloat(grades[i].value);
             const creditVal = parseFloat(credits[i].value);
 
@@ -290,4 +292,3 @@
 
 </body>
 </html>
-
